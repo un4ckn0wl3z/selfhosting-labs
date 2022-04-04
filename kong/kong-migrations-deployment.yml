@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-migrations-deployment
+  namespace: gw-kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-migrations
+  template:
+    metadata:
+      name: kong-migrations
+      labels:
+        app: kong-migrations
+    spec:
+      containers:
+        - name: kong-migrations
+          image: kong
+          command: ["kong"]
+          args: ["migrations", "bootstrap"]
+          env:
+          - name: KONG_DATABASE
+            value: "postgres"
+          - name: KONG_PG_HOST
+            value: "kong-database"
+          - name: KONG_PG_PASSWORD
+            value: "kong"
+          - name: KONG_CASSANDRA_CONTACT_POINTS
+            value: "kong-database"

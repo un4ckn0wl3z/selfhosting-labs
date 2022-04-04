@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api01-deployment
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api01
+  template:
+    metadata:
+      name: api01
+      labels:
+        app: api01
+    spec:
+      containers:
+        - name: api01
+          image: un4ckn0wl3z/node-web-api01:latest
+          ports:
+          - containerPort: 8080
+          - containerPort: 4443

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: krakend-deployment
+  namespace: gw-krakend
+  annotations:
+    configmap.reloader.stakater.com/reload: "krakend-cm"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: krakend
+  template:
+    metadata:
+      name: krakend
+      labels:
+        app: krakend
+    spec:
+      volumes:
+      - name: krakend-cm-volume
+        configMap:
+          name: krakend-cm
+      containers:
+        - name: krakend
+          image: devopsfaith/krakend
+          volumeMounts:
+            - name: krakend-cm-volume
+              mountPath: /etc/krakend/krakend.json
+              subPath: krakend.json
+          securityContext:
+            runAsUser: 0
+          ports:
+          - containerPort: 8000

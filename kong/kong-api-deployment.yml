@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-api-deployment
+  namespace: gw-kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-api
+  template:
+    metadata:
+      name: kong-api
+      labels:
+        app: kong-api
+    spec:
+      volumes:
+      - name: kong-api-cm-volume
+        configMap:
+          name: kong-api-cm
+      containers:
+        - name: kong-api
+          image: un4ckn0wl3z/kong-oidc-jwt-keycloak
+          volumeMounts:
+            - name: kong-api-cm-volume
+              mountPath: /etc/kong/kong.conf
+              subPath: kong.conf
+          securityContext:
+            runAsUser: 0
+          # command: ["/bin/bash","-c"]
+          # args: ["luarocks install kong-oidc --local && luarocks install kong-plugin-jwt-keycloak --local && kong reload -c /etc/kong/kong.conf"]
+          env:
+          - name: LC_CTYPE
+            value: "en_US.UTF-8"
+          - name: LC_ALL
+            value: "en_US.UTF-8"
+          - name: KONG_DATABASE
+            value: "postgres"
+          - name: KONG_PG_HOST
+            value: "kong-database"
+          - name: KONG_PG_USER
+            value: "kong"
+          - name: KONG_PG_PASSWORD
+            value: "kong"
+          - name: KONG_CASSANDRA_CONTACT_POINTS
+            value: "kong-database"
+          - name: KONG_PROXY_ACCESS_LOG
+            value: "/dev/stdout"
+          - name: KONG_ADMIN_ACCESS_LOG
+            value: "/dev/stdout"
+          - name: KONG_PROXY_ERROR_LOG
+            value: "/dev/stdout"
+          - name: KONG_ADMIN_ERROR_LOG
+            value: "/dev/stdout"
+          - name: KONG_ADMIN_LISTEN
+            value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+          ports:
+          - containerPort: 8000
+          - containerPort: 8443
+          - containerPort: 8001
+          - containerPort: 8444

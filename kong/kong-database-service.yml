@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-database
+  namespace: gw-kong
+spec:
+  type: ClusterIP
+  selector:
+    app: kong-database
+  ports:
+    - port: 5432
+      targetPort: 5432
